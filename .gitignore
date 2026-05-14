@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.env
+.DS_Store
+frontend-react/node_modules/
+backend-nest/node_modules/
+backend-nest/dist/
