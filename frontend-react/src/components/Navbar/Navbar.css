@@ -1,0 +1,108 @@
+.navbar {
+  height: 80px;
+  background: white;
+  border-bottom: 1px solid var(--color-mist);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  transition: box-shadow 0.2s ease;
+}
+
+.navbar:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.navbar-left {
+  flex: 0 0 140px;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.logo-icon {
+  font-size: 24px;
+}
+
+.logo-text {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-rausch-coral);
+  letter-spacing: -0.5px;
+}
+
+.navbar-center {
+  flex: 1;
+  max-width: 600px;
+  margin: 0 24px;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.nav-action-item {
+  padding: 10px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-carbon);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.nav-action-item:hover {
+  background: var(--color-fog);
+}
+
+.navbar-profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 5px 5px 12px;
+  border: 1px solid var(--color-mist);
+  border-radius: 30px;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+
+.navbar-profile-trigger:hover {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.18);
+}
+
+.profile-avatar {
+  width: 32px;
+  height: 32px;
+  background: var(--color-slate);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none;
+  }
+  
+  .navbar-center {
+    display: none; /* In mobile we usually use a different search trigger */
+  }
+}

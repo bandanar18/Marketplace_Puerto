@@ -1,0 +1,110 @@
+.quotation-actions-container {
+  padding: 24px;
+  background: var(--color-fog);
+  border-radius: var(--radius-cards);
+  margin-top: 24px;
+  border: 1px solid var(--color-mist);
+}
+
+.actions-buttons {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.actions-buttons button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-approve {
+  background: var(--color-rausch-coral);
+  color: white;
+}
+
+.btn-approve:hover {
+  background: #E31C5F;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 56, 92, 0.2);
+}
+
+.btn-revise {
+  background: white;
+  color: var(--color-carbon);
+  border: 1px solid var(--color-mist) !important;
+}
+
+.btn-revise:hover {
+  background: var(--color-mist);
+}
+
+.btn-reject {
+  background: transparent;
+  color: var(--color-slate);
+}
+
+.btn-reject:hover {
+  color: var(--color-rausch-coral);
+  background: rgba(255, 56, 92, 0.05);
+}
+
+.reason-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reason-form label {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-carbon);
+}
+
+.reason-form textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-mist);
+  font-family: inherit;
+  resize: vertical;
+}
+
+.reason-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-secondary {
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  color: var(--color-slate);
+  cursor: pointer;
+}
+
+.btn-primary {
+  padding: 8px 24px;
+  background: var(--color-carbon);
+  color: white;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-danger {
+  padding: 8px 24px;
+  background: var(--color-rausch-coral);
+  color: white;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}

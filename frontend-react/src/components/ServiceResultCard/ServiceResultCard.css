@@ -1,0 +1,112 @@
+.service-card {
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: var(--radius-cards);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+  border: 1px solid var(--color-mist);
+  height: 100%;
+}
+
+.service-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-subtle);
+  border-color: var(--color-silver);
+}
+
+.service-card-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background-color: var(--color-fog);
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.6s ease;
+}
+
+.service-card:hover .service-card-image {
+  /* scale effect could be added if image was an img tag */
+}
+
+.service-card-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(4px);
+  padding: 4px 10px;
+  border-radius: var(--radius-badges);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-carbon);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.service-card-info {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.service-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 4px;
+}
+
+.service-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-carbon);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.service-card-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-carbon);
+}
+
+.service-card-rating svg {
+  color: var(--color-rausch-coral);
+}
+
+.service-card-store {
+  font-size: 14px;
+  color: var(--color-slate);
+  margin-bottom: 2px;
+}
+
+.service-card-port {
+  font-size: 14px;
+  color: var(--color-slate);
+  margin-bottom: 12px;
+}
+
+.service-card-footer {
+  margin-top: auto;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.service-card-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-carbon);
+}
+
+.service-card-unit {
+  font-size: 14px;
+  color: var(--color-slate);
+}
