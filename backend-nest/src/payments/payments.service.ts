@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Payment } from './entities/payment.entity';
@@ -45,10 +45,14 @@ export class PaymentsService {
       relations: ['order']
     });
     if (!payment) throw new NotFoundException('Payment not found');
+    
+    if (payment.status !== 'PAYMENT_PENDING_VALIDATION') {
+      throw new ForbiddenException(`El pago ya ha sido procesado (Estado actual: ${payment.status})`);
+    }
 
     const previousValue = { ...payment };
     payment.status = status;
-    payment.notes = notes;
+    payment.notes = notes ?? null;
     payment.validatedAt = new Date();
     
     const savedPayment = await this.paymentsRepository.save(payment) as any as Payment;

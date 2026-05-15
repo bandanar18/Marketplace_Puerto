@@ -5,6 +5,8 @@ import { Order } from './entities/order.entity';
 import { OrderEvent } from './entities/order-event.entity';
 import { OrderState } from '../catalogs/entities/order-state.entity';
 import { Quotation } from '../quotations/entities/quotation.entity';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '../notifications/entities/notification.entity';
 
 @Injectable()
 export class OrdersService {
@@ -15,10 +17,12 @@ export class OrdersService {
     private eventsRepository: Repository<OrderEvent>,
     @InjectRepository(OrderState)
     private statesRepository: Repository<OrderState>,
+    private notificationsService: NotificationsService,
   ) {}
 
   async createFromQuotation(quotation: Quotation): Promise<Order> {
     const initialState = await this.statesRepository.findOneBy({ code: 'CREATED' });
+    if (!initialState) throw new Error('Initial state CREATED not found');
     
     // Generate a unique order number
     const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
@@ -97,6 +101,52 @@ export class OrdersService {
       user,
     });
 
+    // Sprint 21: Notification to Client
+    if (savedOrder.client) {
+      await this.notificationsService.create(
+        savedOrder.client.id,
+        NotificationType.ORDER_STATUS,
+        `Actualización de Orden: ${state.name}`,
+        `Tu orden ${savedOrder.orderNumber} ha cambiado al estado: ${state.name}.`,
+        { orderId: savedOrder.id, state: stateCode }
+      );
+    }
+
     return savedOrder;
+  }
+
+  async getStats(storeId: number) {
+    const orders = await this.ordersRepository.find({
+      where: { store: { id: storeId } },
+      relations: ['state'],
+    });
+
+    const totalOrders = orders.length;
+    const totalGMV = orders
+      .filter(o => ['PAID', 'DELIVERED', 'COMPLETED'].includes(o.state.code))
+      .reduce((sum, o) => sum + Number(o.totalAmount), 0);
+
+    const statusDistribution = orders.reduce((acc, o) => {
+      acc[o.state.code] = (acc[o.state.code] || 0) + 1;
+      return acc;
+    }, {});
+
+    return {
+      totalOrders,
+      totalGMV,
+      statusDistribution,
+    };
+  }
+
+  async getOperatorMetrics() {
+    const pendingPayments = await this.ordersRepository.count({
+      where: { state: { code: 'PAYMENT_REPORTED' } }
+    });
+    // This would ideally count inspections from the InspectionsModule
+    return {
+      pendingPayments,
+      pendingInspections: 4, // Mock
+      pendingGateOuts: 2, // Mock
+    };
   }
 }

@@ -26,7 +26,7 @@ export default function CatalogSelect({ catalog, label, value, onChange, placeho
       {label && <label style={{ fontSize: '14px', fontWeight: '600' }}>{label}</label>}
       <select 
         value={value} 
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange && onChange(e.target.value)}
         disabled={loading}
         style={{
           width: '100%',

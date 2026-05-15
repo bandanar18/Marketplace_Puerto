@@ -22,7 +22,7 @@ export class CommissionsService {
 
     if (!rule) {
       rule = await this.rulesRepository.findOne({
-        where: { serviceType: { id: payment.order.service.type.id }, active: true },
+        where: { serviceType: { id: payment.order.service.category.id }, active: true },
       });
     }
 

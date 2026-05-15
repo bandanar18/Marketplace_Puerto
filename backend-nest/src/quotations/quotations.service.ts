@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { Quotation } from './entities/quotation.entity';
 import { OrdersService } from '../orders/orders.service';
 import { AuditService } from '../audit/audit.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '../notifications/entities/notification.entity';
 
 @Injectable()
 export class QuotationsService {
@@ -12,6 +14,7 @@ export class QuotationsService {
     private quotationsRepository: Repository<Quotation>,
     private ordersService: OrdersService,
     private auditService: AuditService,
+    private notificationsService: NotificationsService,
   ) {}
 
   async createRequest(data: any, client: any): Promise<Quotation> {
@@ -74,6 +77,22 @@ export class QuotationsService {
     // Sprint 09: Automatic Order Creation
     await this.ordersService.createFromQuotation(savedQuotation);
     
+    // Sprint 21: Notification to Store
+    const quotationWithStore = await this.quotationsRepository.findOne({
+      where: { id: savedQuotation.id },
+      relations: ['store', 'store.owner', 'service']
+    });
+    
+    if (quotationWithStore?.store?.owner) {
+      await this.notificationsService.create(
+        quotationWithStore.store.owner.id,
+        NotificationType.QUOTATION,
+        '¡Cotización Aprobada!',
+        `El cliente ha aprobado la cotización para el servicio: ${quotationWithStore.service.name}. Se ha generado una nueva orden.`,
+        { quotationId: quotation.id }
+      );
+    }
+    
     return savedQuotation;
   }
 
@@ -114,6 +133,24 @@ export class QuotationsService {
     quotation.status = 'QUOTED';
     quotation.quotedPrice = data.quotedPrice;
     quotation.notes = (quotation.notes || '') + `\nCounter response: ${data.notes}`;
-    return this.quotationsRepository.save(quotation) as any as Promise<Quotation>;
+    const saved = await this.quotationsRepository.save(quotation) as any as Quotation;
+
+    // Sprint 21: Notification to Client
+    const fullQuotation = await this.quotationsRepository.findOne({
+      where: { id: saved.id },
+      relations: ['client', 'service', 'store']
+    });
+
+    if (fullQuotation?.client) {
+      await this.notificationsService.create(
+        fullQuotation.client.id,
+        NotificationType.QUOTATION,
+        'Nueva Cotización Recibida',
+        `${fullQuotation.store.legalName} ha respondido a tu solicitud para ${fullQuotation.service.name} con un precio de $${data.quotedPrice}.`,
+        { quotationId: saved.id }
+      );
+    }
+
+    return saved;
   }
 }

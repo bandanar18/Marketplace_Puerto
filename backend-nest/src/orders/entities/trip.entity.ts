@@ -45,6 +45,12 @@ export class Trip {
   @Column({ type: 'timestamp', nullable: true })
   completedAt: Date;
 
+  @Column({ type: 'text', nullable: true })
+  podSignature: string; // Base64 or URL
+
+  @Column({ type: 'json', nullable: true })
+  podPhotos: string[];
+
   @CreateDateColumn()
   createdAt: Date;
 

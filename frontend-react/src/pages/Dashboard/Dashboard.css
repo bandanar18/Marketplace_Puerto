@@ -1,0 +1,82 @@
+.kpi-card {
+  display: flex;
+  align-items: center;
+  padding: 24px;
+  gap: 16px;
+  position: relative;
+}
+
+.kpi-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kpi-data label {
+  display: block;
+  font-size: 12px;
+  color: var(--color-slate);
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.kpi-data h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.kpi-trend {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.kpi-trend.positive { background: #e6f4ea; color: #1e7e34; }
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dashboard-table th {
+  text-align: left;
+  padding: 12px;
+  font-size: 12px;
+  color: var(--color-slate);
+  border-bottom: 2px solid var(--color-fog);
+}
+
+.dashboard-table td {
+  padding: 16px 12px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--color-mist);
+}
+
+.status-pill {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.status-pill.created { background: #e3f2fd; color: #1976d2; }
+.status-pill.paid { background: #e8f5e9; color: #2e7d32; }
+.status-pill.delivered { background: #fff8e1; color: #f57f17; }
+.status-pill.completed { background: #f3e5f5; color: #7b1fa2; }
+
+.link {
+  color: var(--color-rausch-coral);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.link:hover { text-decoration: underline; }

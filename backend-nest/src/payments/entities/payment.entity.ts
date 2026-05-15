@@ -36,7 +36,7 @@ export class Payment {
   paymentDate: Date;
 
   @Column({ type: 'text', nullable: true })
-  notes: string;
+  notes: string | null;
 
   @Column({ nullable: true })
   validatedAt: Date;

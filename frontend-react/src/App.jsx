@@ -12,9 +12,19 @@ import CustomerDashboard from './pages/Dashboard/CustomerDashboard';
 import FinancialDashboard from './pages/Dashboard/FinancialDashboard';
 import StoreProfilePage from './pages/Store/StoreProfilePage';
 import StoreDashboard from './pages/Dashboard/StoreDashboard';
+import OperatorDashboard from './pages/Dashboard/OperatorDashboard';
+import AuditorDashboard from './pages/Dashboard/AuditorDashboard';
 import OrderDetailPage from './pages/Orders/OrderDetailPage';
 import CommissionConfigPage from './pages/Admin/CommissionConfigPage';
 import AuditLogsPage from './pages/Admin/AuditLogsPage';
+import AdminAnalyticsPage from './pages/Admin/AdminAnalyticsPage';
+import WmsInventoryPage from './pages/Wms/WmsInventoryPage';
+import AgdDashboard from './pages/Agd/AgdDashboard';
+import ReportsPage from './pages/Reports/ReportsPage';
+import SupportPage from './pages/Support/SupportPage';
+import ProfilePage from './pages/Profile/ProfilePage';
+import ChatPage from './pages/Chat/ChatPage';
+import ErrorBoundary from './components/Common/ErrorBoundary';
 import './App.css';
 
 import FilterSidebar from './components/Search/FilterSidebar';
@@ -98,23 +108,35 @@ function HomePage() {
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/admin/catalogs" element={<AdminCatalogsPage />} />
-      <Route path="/store/onboarding" element={<StoreOnboarding />} />
-      <Route path="/store/services/new" element={<ServiceWizard />} />
-      <Route path="/services/:id" element={<ServiceDetailPage />} />
-      <Route path="/dashboard" element={<CustomerDashboard />} />
-      <Route path="/finances" element={<FinancialDashboard />} />
-      <Route path="/store/:id" element={<StoreProfilePage />} />
-      <Route path="/store/dashboard" element={<StoreDashboard />} />
-      <Route path="/orders/:id" element={<OrderDetailPage />} />
-      <Route path="/admin/commissions" element={<CommissionConfigPage />} />
-      <Route path="/admin/audit" element={<AuditLogsPage />} />
-      {/* Add more routes as needed */}
-    </Routes>
+    <ErrorBoundary>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        {/* ... existing routes ... */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/admin/catalogs" element={<AdminCatalogsPage />} />
+        <Route path="/store/onboarding" element={<StoreOnboarding />} />
+        <Route path="/store/services/new" element={<ServiceWizard />} />
+        <Route path="/services/:id" element={<ServiceDetailPage />} />
+        <Route path="/dashboard" element={<CustomerDashboard />} />
+        <Route path="/finances" element={<FinancialDashboard />} />
+        <Route path="/store/:id" element={<StoreProfilePage />} />
+        <Route path="/store/dashboard" element={<StoreDashboard />} />
+        <Route path="/operator/dashboard" element={<OperatorDashboard />} />
+        <Route path="/auditor/dashboard" element={<AuditorDashboard />} />
+        <Route path="/orders/:id" element={<OrderDetailPage />} />
+        <Route path="/admin/commissions" element={<CommissionConfigPage />} />
+        <Route path="/admin/audit" element={<AuditLogsPage />} />
+        <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
+        <Route path="/wms/inventory" element={<WmsInventoryPage />} />
+        <Route path="/agd/dashboard" element={<AgdDashboard />} />
+        <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/support" element={<SupportPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/chat" element={<ChatPage />} />
+        {/* Add more routes as needed */}
+      </Routes>
+    </ErrorBoundary>
   );
 }
 

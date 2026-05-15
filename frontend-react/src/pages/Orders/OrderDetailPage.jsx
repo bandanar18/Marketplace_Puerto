@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import AppLayout from '../../layouts/AppLayout/AppLayout';
-import { Clock, Package, MapPin, CreditCard, ChevronRight, DollarSign, Truck } from 'lucide-react';
+import { Clock, Package, MapPin, CreditCard, ChevronRight, DollarSign, Truck, Star, ClipboardCheck } from 'lucide-react';
 import PaymentForm from '../../components/Payments/PaymentForm';
 import DocumentManager from '../../components/Orders/DocumentManager';
 import TripAssignmentForm from '../../components/Orders/TripAssignmentForm';
 import TripTracker from '../../components/Orders/TripTracker';
 import ReviewForm from '../../components/Reviews/ReviewForm';
+import InspectionForm from '../../components/Inspections/InspectionForm';
+import SignaturePad from '../../components/Transport/SignaturePad';
 import './OrderDetailPage.css';
 
 export default function OrderDetailPage() {
@@ -18,6 +20,7 @@ export default function OrderDetailPage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showTripModal, setShowTripModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showInspectionModal, setShowInspectionModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -164,6 +167,12 @@ export default function OrderDetailPage() {
                     Finalizar y Calificar
                   </button>
                 )}
+                {order.state.code === 'PAID' && (
+                  <button className="btn btn-secondary full-width" onClick={() => setShowInspectionModal(true)}>
+                    <ClipboardCheck size={16} style={{ marginRight: '8px' }} />
+                    Realizar Inspección
+                  </button>
+                )}
                 <button className="btn btn-secondary full-width">Enviar Mensaje</button>
               </div>
             </div>
@@ -199,7 +208,12 @@ export default function OrderDetailPage() {
             }} 
           />
         )}
+
+        {showInspectionModal && (
+          <InspectionForm 
+            orderId={order.id} 
+            templateId={1} 
+            onClose={() => setShowInspectionModal(false)} 
+          />
+        )}
       </div>
-    </AppLayout>
-  );
-}

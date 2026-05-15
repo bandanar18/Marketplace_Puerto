@@ -43,7 +43,7 @@ export default function QuotationModal({ service, onClose }) {
       backgroundColor: 'rgba(0,0,0,0.5)',
       display: 'flex',
       alignItems: 'center',
-      justify-content: center,
+      justifyContent: 'center',
       zIndex: 1000
     }}>
       <div className="modal-content" style={{
@@ -51,7 +51,7 @@ export default function QuotationModal({ service, onClose }) {
         padding: '32px',
         borderRadius: '24px',
         width: '100%',
-        maxWdith: '500px',
+        maxWidth: '500px',
         position: 'relative'
       }}>
         <button onClick={onClose} style={{ position: 'absolute', right: '20px', top: '20px', border: 'none', background: 'none', cursor: 'pointer' }}>

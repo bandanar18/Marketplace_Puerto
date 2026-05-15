@@ -127,6 +127,14 @@ export default function ServiceDetailPage() {
                 Solicitar Cotización
               </button>
               
+              <button 
+                className="btn btn-secondary" 
+                style={{ width: '100%', height: '48px', fontSize: '16px', marginTop: '12px', background: 'white', border: '1px solid var(--color-carbon)' }}
+                onClick={() => user ? navigate('/chat') : navigate('/login')}
+              >
+                Consultar con proveedor
+              </button>
+              
               <p style={{ textAlign: 'center', fontSize: '14px', marginTop: '16px', color: 'var(--color-slate)' }}>
                 No se te cobrará nada aún
               </p>

@@ -36,8 +36,22 @@ import { DocumentsModule } from './documents/documents.module';
 import { Commission } from './commissions/entities/commission.entity';
 import { CommissionRule } from './commissions/entities/commission-rule.entity';
 import { CommissionsModule } from './commissions/commissions.module';
-import { AuditLog } from './audit/entities/audit-log.entity';
 import { AuditModule } from './audit/audit.module';
+import { InventoryItem } from './wms/entities/inventory-item.entity';
+import { Warehouse, WmsZone, Rack, RackPosition } from './wms/entities/warehouse-hierarchy.entities';
+import { WmsModule } from './wms/wms.module';
+import { CertificateOfDeposit, PledgeBond } from './agd/entities/agd.entities';
+import { AgdModule } from './agd/agd.module';
+import { InspectionTemplate, InspectionChecklist } from './inspections/entities/inspection.entities';
+import { InspectionsModule } from './inspections/inspections.module';
+import { ReportsModule } from './reports/reports.module';
+import { SupportTicket, SupportMessage } from './support/entities/support.entities';
+import { SupportModule } from './support/support.module';
+import { AuditLog } from './audit/entities/audit-log.entity';
+import { Notification } from './notifications/entities/notification.entity';
+import { NotificationsModule } from './notifications/notifications.module';
+import { Message } from './messages/entities/message.entity';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -53,7 +67,12 @@ import { AuditModule } from './audit/audit.module';
         User, Role, Permission, 
         Country, Currency, Unit, ServiceType, Port, OrderState,
         Store, Service, Quotation, Payment, Review, Order, Trip, OrderEvent, Document,
-        Commission, CommissionRule, AuditLog
+        Commission, CommissionRule, AuditLog,
+        InventoryItem, Warehouse, WmsZone, Rack, RackPosition,
+        CertificateOfDeposit, PledgeBond,
+        InspectionTemplate, InspectionChecklist,
+        SupportTicket, SupportMessage,
+        Notification, Message
       ],
       synchronize: true, // Should be false in production
     }),
@@ -71,6 +90,13 @@ import { AuditModule } from './audit/audit.module';
     DocumentsModule,
     CommissionsModule,
     AuditModule,
+    WmsModule,
+    AgdModule,
+    InspectionsModule,
+    ReportsModule,
+    SupportModule,
+    NotificationsModule,
+    MessagesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

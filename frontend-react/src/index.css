@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap');
 @import './styles/variables.css';
 
 /* ===== RESET ===== */
@@ -6,6 +6,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  transition: var(--transition-smooth);
 }
 
 html {
@@ -16,7 +17,7 @@ html {
 }
 
 body {
-  font-family: var(--font-airbnb-cereal-vf);
+  font-family: var(--font-body);
   background-color: var(--surface-canvas);
   color: var(--color-carbon);
   line-height: 1.6;
@@ -37,9 +38,11 @@ ul, ol { list-style: none; }
 
 /* ===== TYPOGRAPHY ===== */
 h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
   font-weight: 700;
   line-height: 1.2;
   color: var(--color-carbon);
+  letter-spacing: -0.02em;
 }
 
 /* ===== BUTTONS ===== */

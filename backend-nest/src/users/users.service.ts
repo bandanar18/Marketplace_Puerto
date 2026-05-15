@@ -37,4 +37,15 @@ export class UsersService {
       relations: ['role'] 
     });
   }
+
+  async update(id: number, data: any): Promise<User> {
+    const user = await this.findOne(id);
+    if (!user) throw new Error('User not found');
+    
+    // Protection: don't allow changing role or email easily here for security
+    const { email, role, passwordHash, ...updateData } = data;
+    
+    Object.assign(user, updateData);
+    return this.usersRepository.save(user) as any as Promise<User>;
+  }
 }

@@ -10,8 +10,8 @@
 2. [Fase 2 — Marketplace Comercial (Sprints 04–08)](#fase-2)
 3. [Fase 3 — Operaciones y Finanzas (Sprints 09–12)](#fase-3)
 4. [Fase 4 — Logística Integrada TOS-WMS-AGD (Sprints 13–17)](#fase-4)
-5. [Fase 5 — Inteligencia y Soporte (Sprints 18–20)](#fase-5)
-6. [Fase 6 — Cierre y Hardening (Sprints 21–23)](#fase-6)
+5. [Fase 5 — Inteligencia, Comunicación y Soporte (Sprints 18–22)](#fase-5)
+6. [Fase 6 — Cierre y Hardening (Sprints 23–26)](#fase-6)
 
 ---
 
@@ -115,6 +115,7 @@
 - Context/Store de autenticación con persistencia en `localStorage` (solo el access token)
 - HOC `<ProtectedRoute>` que valida JWT y redirige si expiró
 - Implementar lógica de refresco automático de token antes de expiración
+- **[NUEVO]** Página de "Mi Perfil" para gestión de datos personales y seguridad
 
 🗄️ **Migraciones**
 - `002_auth_tables`: tablas `users`, `roles`, `permissions`, `role_permissions`, `refresh_tokens`
@@ -474,6 +475,7 @@
 ⚠️ **Riesgos**
 - Definir el proveedor de almacenamiento de archivos (S3, GCS o local) antes de iniciar este sprint
 - Validar tamaño máximo de archivos de comprobante (recomendado: 10 MB)
+- **[NUEVO]** Motor de generación de facturas proforma y recibos en PDF
 
 ---
 
@@ -792,9 +794,11 @@
 
 ---
 
+---
+
 <a name="fase-5"></a>
-## Fase 5 — Inteligencia y Soporte
-> Agrega la capa de visibilidad analítica con dashboards personalizados, reportes financieros exportables y un sistema de tickets de soporte.
+## Fase 5 — Inteligencia, Comunicación y Soporte
+> Agrega la capa de visibilidad analítica con dashboards personalizados, reportes financieros exportables, sistema de notificaciones en tiempo real, chat directo y soporte al cliente.
 
 ---
 
@@ -902,9 +906,61 @@
 
 ---
 
+### Sprint 21 — Motor de Notificaciones y Preferencias
+
+🎯 **Objetivo:** Implementar un sistema centralizado de notificaciones (Push, In-app y Email) con gestión de preferencias para el usuario.
+
+📋 **Backend**
+- Crear módulo `NotificationsModule`
+- Endpoint `GET /notifications` — listar notificaciones del usuario
+- Endpoint `PUT /notifications/:id/read` — marcar como leída
+- Implementar `NotificationService` transversal para disparar alertas desde cualquier módulo
+- Integración con servicio de Email (SendGrid/Mailgun) usando templates dinámicos
+- Soporte para notificaciones en tiempo real (WebSockets)
+- Tabla `user_notification_preferences` para permitir al usuario desactivar canales específicos
+
+🖥️ **Frontend**
+- Componente "Bell" de notificaciones en el Navbar con contador en tiempo real
+- Panel lateral de notificaciones con scroll infinito
+- Página de "Preferencias de Notificación" en el perfil del usuario
+- Toasts dinámicos para alertas inmediatas mientras el usuario navega
+
+✅ **Criterios de aceptación**
+- Una acción crítica (ej. aprobación de pago) genera una notificación inmediata
+- El usuario puede marcar todas las notificaciones como leídas
+- Si el usuario desactiva correos, el sistema solo envía notificaciones in-app
+
+---
+
+### Sprint 22 — Calificaciones, Reseñas y Chat Directo
+
+🎯 **Objetivo:** Fomentar la confianza en el marketplace mediante un sistema de reputación y permitir la comunicación directa entre clientes y tiendas.
+
+📋 **Backend**
+- Crear módulo `ReviewsModule` (si no existe)
+- `POST /reviews` — crear reseña vinculada a una orden completada
+- `GET /stores/:id/reviews` — listar reseñas de una tienda con promedio de estrellas
+- Crear módulo `MessagingModule`
+- `POST /messages/send` — enviar mensaje directo
+- `GET /messages/conversations` — listar conversaciones activas
+- Implementar WebSockets para chat en tiempo real
+
+🖥️ **Frontend**
+- Formulario de calificación al finalizar una orden
+- Sección de reseñas en el detalle de la tienda
+- Mini-chat flotante para comunicación directa entre Cliente y Tienda
+- Bandeja de entrada de mensajes tipo WhatsApp Web
+
+✅ **Criterios de aceptación**
+- Solo se puede calificar órdenes en estado `COMPLETED`
+- El promedio de la tienda se actualiza automáticamente al recibir una reseña
+- Los mensajes se entregan en tiempo real sin recargar la página
+
+---
+
 <a name="fase-6"></a>
 ## Fase 6 — Cierre y Hardening
-> Asegura la calidad integral del producto, documenta la API y prepara la demostración final del MVP para stakeholders.
+> Asegura la calidad integral del producto, implementa la internacionalización, optimiza para móviles y prepara la demostración final del MVP.
 
 ---
 
@@ -1029,10 +1085,10 @@
 | 1 — Fundaciones | 01–03 | 6 semanas | Auth JWT, RBAC, catálogos |
 | 2 — Marketplace | 04–08 | 10 semanas | Búsqueda, tiendas, cotizaciones |
 | 3 — Operaciones | 09–12 | 8 semanas | Órdenes, pagos, comisiones, Audit Trail |
-| 4 — TOS-WMS-AGD | 13–17 | 10 semanas | Patios, garitas, almacén, instrumentos financieros |
-| 5 — Inteligencia | 18–20 | 6 semanas | Dashboards, reportes, soporte |
-| 6 — Cierre | 21–23 | 6 semanas | QA, Swagger, Demo MVP |
-| **Total** | **23 sprints** | **~46 semanas** | **MVP completo listo para producción** |
+| 4 — TOS-WMS-AGD | 13–17 | 10 semanas | Patios, garitas, almacén, instrumentos |
+| 5 — Comunicación | 18–22 | 10 semanas | Dashboards, reportes, notificaciones, chat |
+| 6 — Cierre | 23–26 | 8 semanas | i18n, Móvil, QA, Swagger, Demo MVP |
+| **Total** | **26 sprints** | **~52 semanas** | **MVP completo y escalable** |
 
 ---
 
