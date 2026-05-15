@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import AppLayout from '../../layouts/AppLayout/AppLayout';
 import { Send, User, Search } from 'lucide-react';
+import { io } from 'socket.io-client';
 
 export default function ChatPage() {
   const [conversations, setConversations] = useState([]);
@@ -8,6 +9,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const socketRef = useRef();
   const scrollRef = useRef();
 
   const fetchRecent = async () => {
@@ -42,12 +44,32 @@ export default function ChatPage() {
   };
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    // Normalize URL: remove /api if present because socket.io usually runs on the root or a specific path
+    const socketUrl = import.meta.env.VITE_API_URL.replace('/api', '');
+    socketRef.current = io(socketUrl, {
+      auth: { token: `Bearer ${token}` }
+    });
+
+    socketRef.current.on('newMessage', (msg) => {
+      // If the message belongs to current conversation, add it
+      if (selectedContact && (msg.senderId === selectedContact.id || msg.receiverId === selectedContact.id)) {
+        setMessages(prev => [...prev, msg]);
+      }
+      fetchRecent(); // Refresh sidebar
+    });
+
     fetchRecent();
-    const interval = setInterval(() => {
-      if (selectedContact) fetchConversation(selectedContact.id);
-      fetchRecent();
-    }, 5000);
-    return () => clearInterval(interval);
+
+    return () => {
+      socketRef.current.disconnect();
+    };
+  }, [selectedContact]);
+
+  useEffect(() => {
+    if (selectedContact) {
+      fetchConversation(selectedContact.id);
+    }
   }, [selectedContact]);
 
   useEffect(() => {
@@ -60,23 +82,11 @@ export default function ChatPage() {
     e.preventDefault();
     if (!newMessage.trim() || !selectedContact) return;
 
-    const token = localStorage.getItem('token');
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/messages/send`, {
-        method: 'POST',
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ receiverId: selectedContact.id, content: newMessage })
-      });
-      if (response.ok) {
-        setNewMessage('');
-        fetchConversation(selectedContact.id);
-      }
-    } catch (err) {
-      console.error(err);
-    }
+    socketRef.current.emit('sendMessage', {
+      receiverId: selectedContact.id,
+      content: newMessage
+    });
+    setNewMessage('');
   };
 
   return (

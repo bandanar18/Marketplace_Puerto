@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import AppLayout from '../../layouts/AppLayout/AppLayout';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Shield, Globe, Users, TrendingUp, CreditCard } from 'lucide-react';
+import { Shield, Globe, Users, TrendingUp, CreditCard, Settings, ClipboardList } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import '../Dashboard/Dashboard.css';
 
 export default function AdminAnalyticsPage() {
@@ -23,9 +24,21 @@ export default function AdminAnalyticsPage() {
   return (
     <AppLayout>
       <div className="container" style={{ padding: '40px 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
-          <Shield size={32} color="var(--color-carbon)" />
-          <h1 style={{ margin: 0 }}>Analítica Global</h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <Shield size={32} color="var(--color-carbon)" />
+            <h1 style={{ margin: 0 }}>Analítica Global</h1>
+          </div>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <Link to="/admin/audit" className="btn btn-secondary">
+              <ClipboardList size={18} style={{ marginRight: '8px' }} />
+              Auditoría
+            </Link>
+            <Link to="/admin/settings" className="btn btn-secondary">
+              <Settings size={18} style={{ marginRight: '8px' }} />
+              Configuración
+            </Link>
+          </div>
         </div>
 
         <div className="kpi-grid" style={{ 

@@ -8,9 +8,8 @@ export class AuditController {
   constructor(private auditService: AuditService) {}
 
   @Get('logs')
-  async getLogs() {
-    // In production, we'd check if user has 'AUDITOR' or 'ADMIN' role
-    return this.auditService.findAll();
+  async getLogs(@Query() query: any) {
+    return this.auditService.findAll(query);
   }
 
   @Get('entity')

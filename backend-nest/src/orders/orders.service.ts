@@ -56,7 +56,7 @@ export class OrdersService {
   async findByClient(clientId: number): Promise<Order[]> {
     return this.ordersRepository.find({
       where: { client: { id: clientId } },
-      relations: ['state', 'service', 'store'],
+      relations: ['state', 'service', 'store', 'quotation'],
       order: { createdAt: 'DESC' },
     });
   }
@@ -115,9 +115,10 @@ export class OrdersService {
     return savedOrder;
   }
 
-  async getStats(storeId: number) {
+  async getStats(id: number, type: 'store' | 'client' = 'store') {
+    const where = type === 'store' ? { store: { id } } : { client: { id } };
     const orders = await this.ordersRepository.find({
-      where: { store: { id: storeId } },
+      where,
       relations: ['state'],
     });
 
@@ -140,11 +141,14 @@ export class OrdersService {
 
   async getOperatorMetrics() {
     const pendingPayments = await this.ordersRepository.count({
-      where: { state: { code: 'PAYMENT_REPORTED' } }
+      where: { state: { code: 'PAYMENT_PENDING_VALIDATION' } }
     });
-    // This would ideally count inspections from the InspectionsModule
+    const activeTrips = await this.ordersRepository.count({
+      where: { state: { code: 'IN_PROGRESS' } }
+    });
     return {
       pendingPayments,
+      activeTrips,
       pendingInspections: 4, // Mock
       pendingGateOuts: 2, // Mock
     };

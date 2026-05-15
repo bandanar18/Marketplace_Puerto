@@ -4,3 +4,16 @@
   margin: 0 auto;
   padding: 0 var(--spacing-24);
 }
+
+.marker-hovered {
+  filter: hue-rotate(150deg) brightness(1.2);
+  transition: all 0.2s ease;
+}
+
+.view-toggle button {
+  transition: all 0.2s ease;
+}
+
+.view-toggle button:hover {
+  color: var(--color-rausch-coral);
+}

@@ -10,8 +10,15 @@ import { OrderState } from '../catalogs/entities/order-state.entity';
 import { TripsService } from './trips.service';
 import { TripsController } from './trips.controller';
 
+import { StoresModule } from '../stores/stores.module';
+import { NotificationsModule } from '../notifications/notifications.module';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([Order, Trip, OrderEvent, OrderState])],
+  imports: [
+    TypeOrmModule.forFeature([Order, Trip, OrderEvent, OrderState]),
+    StoresModule,
+    NotificationsModule
+  ],
   controllers: [OrdersController, TripsController],
   providers: [OrdersService, TripsService],
   exports: [OrdersService, TripsService],

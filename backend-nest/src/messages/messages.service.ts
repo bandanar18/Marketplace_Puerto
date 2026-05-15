@@ -55,6 +55,15 @@ export class MessagesService {
     return Array.from(conversations.values());
   }
 
+  async create(data: { senderId: number, receiverId: number, content: string }): Promise<Message> {
+    const message = this.messagesRepository.create({
+      senderId: data.senderId,
+      receiverId: data.receiverId,
+      content: data.content,
+    });
+    return this.messagesRepository.save(message) as any as Promise<Message>;
+  }
+
   async markAsRead(receiverId: number, senderId: number): Promise<void> {
     await this.messagesRepository.update(
       { receiverId, senderId, isRead: false },

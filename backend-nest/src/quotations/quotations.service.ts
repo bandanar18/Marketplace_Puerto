@@ -37,7 +37,7 @@ export class QuotationsService {
   async findByStore(storeId: number): Promise<Quotation[]> {
     return this.quotationsRepository.find({
       where: { store: { id: storeId } },
-      relations: ['service', 'client'],
+      relations: ['service', 'client', 'service.category'],
       order: { createdAt: 'DESC' }
     });
   }

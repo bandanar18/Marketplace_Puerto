@@ -14,8 +14,21 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     try {
-      await login(email, password);
-      navigate('/');
+      const data = await login(email, password);
+      
+      const roleRoutes = {
+        ADMIN: '/admin/analytics',
+        STORE_OWNER: '/store/dashboard',
+        OPERATOR: '/operator/dashboard',
+        AUDITOR: '/auditor/dashboard',
+        FINANCIAL: '/finances',
+        WMS_OPERATOR: '/wms/inventory',
+        AGD_MANAGER: '/agd/dashboard',
+        CUSTOMER: '/dashboard',
+      };
+
+      const targetRoute = roleRoutes[data.user.role.name] || '/';
+      navigate(targetRoute);
     } catch (err) {
       setError('Correo o contraseña incorrectos');
     }

@@ -1,14 +1,22 @@
 import Navbar from '../../components/Navbar/Navbar';
+import Sidebar from '../../components/Navigation/Sidebar';
+import { useAuth } from '../../context/AuthContext';
 import './AppLayout.css';
 
 export default function AppLayout({ children, onSearch }) {
+  const { user } = useAuth();
+
   return (
-    <div className="app-layout">
+    <div className={`app-layout ${user ? 'has-sidebar' : ''}`}>
       <Navbar onSearch={onSearch} />
-      <main className="app-main">
-        {children}
-      </main>
-      <footer className="app-footer">
+      <div className="app-container">
+        {user && <Sidebar />}
+        <main className="app-main">
+          {children}
+        </main>
+      </div>
+      {!user && (
+        <footer className="app-footer">
         <div className="container">
           <div className="footer-content">
             <div className="footer-brand">
@@ -21,6 +29,7 @@ export default function AppLayout({ children, onSearch }) {
           </div>
         </div>
       </footer>
+      )}
     </div>
   );
 }

@@ -11,18 +11,25 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
+    console.log(`Validating user: ${email}`);
     const user = await this.usersService.findOneByEmail(email);
+    console.log(`User found: ${!!user}`);
     if (user && await bcrypt.compare(pass, user.passwordHash)) {
+      console.log('Password match');
       const { passwordHash, ...result } = user;
       return result;
     }
+    console.log('Validation failed');
     return null;
   }
 
   async login(user: any) {
-    const payload = { email: user.email, sub: user.id, role: user.role?.name };
-    return {
-      access_token: this.jwtService.sign(payload),
+    console.log('Generating JWT for:', user.email);
+    const payload = { email: user.email, sub: user.id, role: user.role?.name || 'GUEST' };
+    try {
+      const token = this.jwtService.sign(payload);
+      return {
+        access_token: token,
       user: {
         id: user.id,
         email: user.email,
@@ -31,6 +38,10 @@ export class AuthService {
         role: user.role,
       }
     };
+    } catch (err) {
+      console.error('JWT Signing failed:', err);
+      throw err;
+    }
   }
 
   async register(userData: any) {

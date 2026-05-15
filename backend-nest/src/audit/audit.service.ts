@@ -15,11 +15,15 @@ export class AuditService {
     await this.auditRepository.save(entry);
   }
 
-  async findAll(): Promise<AuditLog[]> {
-    return this.auditRepository.find({
-      order: { timestamp: 'DESC' },
-      take: 100, // Limit for safety
-    });
+  async findAll(filters: any = {}): Promise<AuditLog[]> {
+    const { userId, action, entityType } = filters;
+    const query = this.auditRepository.createQueryBuilder('log');
+
+    if (userId) query.andWhere('log.userId = :userId', { userId });
+    if (action) query.andWhere('log.action = :action', { action });
+    if (entityType) query.andWhere('log.entityType = :entityType', { entityType });
+
+    return query.orderBy('log.timestamp', 'DESC').take(200).getMany();
   }
 
   async findByEntity(type: string, id: number): Promise<AuditLog[]> {

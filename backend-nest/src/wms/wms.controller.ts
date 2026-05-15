@@ -21,4 +21,9 @@ export class WmsController {
   async getRackPositions(@Param('id') id: number) {
     return this.wmsService.getPositionsByRack(Number(id));
   }
+
+  @Post('dispatch/:id')
+  async dispatch(@Param('id') id: number, @Request() req) {
+    return this.wmsService.dispatch(Number(id), req.user);
+  }
 }

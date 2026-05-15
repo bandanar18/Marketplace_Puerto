@@ -1,18 +1,25 @@
 import { useState } from 'react';
 import { Star, X, Send } from 'lucide-react';
 
-export default function ReviewForm({ order, onClose }) {
+export default function ReviewForm({ order, service, onClose, onReviewSubmitted }) {
   const [rating, setRating] = useState(5);
   const [hover, setHover] = useState(0);
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const targetId = order?.id || service?.id;
+  const storeName = order?.store?.legalName || service?.store?.legalName || 'el proveedor';
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     const token = localStorage.getItem('token');
+    const endpoint = order 
+      ? `${import.meta.env.VITE_API_URL}/reviews/order/${order.id}`
+      : `${import.meta.env.VITE_API_URL}/reviews/service/${service.id}`;
+
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/reviews/order/${order.id}`, {
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -22,8 +29,11 @@ export default function ReviewForm({ order, onClose }) {
       });
 
       if (!response.ok) throw new Error('Failed to submit review');
-      onClose();
-      window.location.reload();
+      
+      if (onClose) onClose();
+      if (onReviewSubmitted) onReviewSubmitted();
+      
+      if (order) window.location.reload();
     } catch (err) {
       console.error(err);
     } finally {
@@ -31,18 +41,19 @@ export default function ReviewForm({ order, onClose }) {
     }
   };
 
-  return (
-    <div className="modal-overlay" style={{
-      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex',
-      alignItems: 'center', justifyContent: 'center', zIndex: 1000,
-      backdropFilter: 'blur(8px)'
+  const isModal = !!onClose;
+
+  const content = (
+    <div className={isModal ? "modal-content" : ""} style={{
+      background: 'white', 
+      padding: isModal ? '40px' : '24px 0', 
+      borderRadius: isModal ? '32px' : '0',
+      width: '100%', 
+      maxWidth: isModal ? '480px' : '100%', 
+      position: 'relative',
+      textAlign: isModal ? 'center' : 'left'
     }}>
-      <div className="modal-content" style={{
-        background: 'white', padding: '40px', borderRadius: '32px',
-        width: '100%', maxWidth: '480px', position: 'relative',
-        textAlign: 'center'
-      }}>
+      {isModal && (
         <button onClick={onClose} style={{ 
           position: 'absolute', right: '24px', top: '24px', 
           border: 'none', background: 'var(--color-fog)', 
@@ -50,7 +61,9 @@ export default function ReviewForm({ order, onClose }) {
         }}>
           <X size={20} />
         </button>
+      )}
 
+      {isModal && (
         <div style={{ 
           width: '64px', height: '64px', background: '#fff8e1', 
           borderRadius: '20px', display: 'flex', alignItems: 'center', 
@@ -58,11 +71,14 @@ export default function ReviewForm({ order, onClose }) {
         }}>
           <Star size={32} color="#f57f17" fill="#f57f17" />
         </div>
+      )}
 
-        <h2 style={{ marginBottom: '8px', fontSize: '24px', fontWeight: '800' }}>¿Cómo fue tu experiencia?</h2>
-        <p style={{ color: 'var(--color-slate)', marginBottom: '32px', fontSize: '14px' }}>
-          Tu calificación ayuda a {order.store.legalName} a mejorar su servicio.
-        </p>
+      <h2 style={{ marginBottom: '8px', fontSize: isModal ? '24px' : '20px', fontWeight: '800' }}>
+        {isModal ? '¿Cómo fue tu experiencia?' : 'Deja una reseña'}
+      </h2>
+      <p style={{ color: 'var(--color-slate)', marginBottom: '32px', fontSize: '14px' }}>
+        Tu calificación ayuda a {storeName} a mejorar su servicio.
+      </p>
         
         <form onSubmit={handleSubmit}>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '32px' }}>
@@ -107,6 +123,20 @@ export default function ReviewForm({ order, onClose }) {
           </button>
         </form>
       </div>
-    </div>
   );
+
+  if (isModal) {
+    return (
+      <div className="modal-overlay" style={{
+        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex',
+        alignItems: 'center', justifyContent: 'center', zIndex: 1000,
+        backdropFilter: 'blur(8px)'
+      }}>
+        {content}
+      </div>
+    );
+  }
+
+  return content;
 }

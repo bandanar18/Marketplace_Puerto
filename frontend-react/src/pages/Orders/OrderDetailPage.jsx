@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import AppLayout from '../../layouts/AppLayout/AppLayout';
-import { Clock, Package, MapPin, CreditCard, ChevronRight, DollarSign, Truck, Star, ClipboardCheck } from 'lucide-react';
+import { Clock, Package, MapPin, CreditCard, ChevronRight, DollarSign, Truck, Star, ClipboardCheck, Database } from 'lucide-react';
 import PaymentForm from '../../components/Payments/PaymentForm';
 import DocumentManager from '../../components/Orders/DocumentManager';
 import TripAssignmentForm from '../../components/Orders/TripAssignmentForm';
 import TripTracker from '../../components/Orders/TripTracker';
 import ReviewForm from '../../components/Reviews/ReviewForm';
 import InspectionForm from '../../components/Inspections/InspectionForm';
-import SignaturePad from '../../components/Transport/SignaturePad';
+import WmsReceiveModal from '../../components/Wms/WmsReceiveModal';
 import './OrderDetailPage.css';
 
 export default function OrderDetailPage() {
@@ -21,6 +21,7 @@ export default function OrderDetailPage() {
   const [showTripModal, setShowTripModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showInspectionModal, setShowInspectionModal] = useState(false);
+  const [showWmsModal, setShowWmsModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,85 +55,66 @@ export default function OrderDetailPage() {
     fetchData();
   }, [id]);
 
-  const handleRefresh = () => {
-    setLoading(true);
-    // Trigger useEffect refresh
-    setOrder(null);
-  };
-
   if (loading) return <AppLayout><div className="container">Cargando detalles de la orden...</div></AppLayout>;
   if (!order) return <AppLayout><div className="container">Orden no encontrada.</div></AppLayout>;
 
   return (
     <AppLayout>
-      <div className="container order-detail-container">
-        <div className="order-header">
-          <div className="order-title-group">
-            <h1>Orden {order.orderNumber}</h1>
-            <div className={`status-badge status-${order.state.code.toLowerCase()}`}>
+      <div className="container order-detail-container" style={{ padding: '40px 0' }}>
+        <div className="order-header" style={{ marginBottom: '32px' }}>
+          <div className="order-title-group" style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '12px' }}>
+            <h1 style={{ margin: 0 }}>Orden {order.orderNumber}</h1>
+            <span className={`badge badge-${order.state.code.toLowerCase()}`} style={{ padding: '6px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: '800' }}>
               {order.state.name}
-            </div>
+            </span>
           </div>
-          <div className="order-meta">
+          <div className="order-meta" style={{ color: 'var(--color-slate)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span>Creada el {new Date(order.createdAt).toLocaleDateString()}</span>
-            <ChevronRight size={16} />
+            <ChevronRight size={14} />
             <span>{order.service.name}</span>
           </div>
         </div>
 
-        <div className="order-grid">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '32px' }}>
           <div className="order-main">
-            <section className="order-section card">
-              <h2>Detalles del Servicio</h2>
-              <div className="info-grid">
-                <div className="info-item">
-                  <Package size={20} />
+            <section className="card" style={{ marginBottom: '32px', padding: '32px' }}>
+              <h2 style={{ fontSize: '18px', marginBottom: '24px' }}>Detalles del Servicio</h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px' }}>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <Package size={20} color="var(--color-rausch-coral)" />
                   <div>
-                    <label>Tienda</label>
-                    <p>{order.store.legalName}</p>
+                    <label style={{ fontSize: '12px', color: 'var(--color-slate)', display: 'block' }}>Tienda</label>
+                    <span style={{ fontWeight: '700' }}>{order.store.legalName}</span>
                   </div>
                 </div>
-                <div className="info-item">
-                  <CreditCard size={20} />
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <DollarSign size={20} color="var(--color-rausch-coral)" />
                   <div>
-                    <label>Monto Total</label>
-                    <p>${order.totalAmount}</p>
+                    <label style={{ fontSize: '12px', color: 'var(--color-slate)', display: 'block' }}>Monto Total</label>
+                    <span style={{ fontWeight: '700' }}>${order.totalAmount}</span>
                   </div>
                 </div>
-                <div className="info-item">
-                  <MapPin size={20} />
-                  <div>
-                    <label>Ubicación Base</label>
-                    <p>{order.store.basePort?.name || 'No especificado'}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="order-description">
-                <label>Descripción</label>
-                <p>{order.description || 'Sin descripción adicional.'}</p>
               </div>
             </section>
 
             <DocumentManager orderId={id} />
 
-            {trips.map(trip => (
-              <TripTracker key={trip.id} trip={trip} />
-            ))}
+            {trips.length > 0 && (
+              <div style={{ marginTop: '32px' }}>
+                <h2 style={{ fontSize: '18px', marginBottom: '16px' }}>Seguimiento de Despacho</h2>
+                {trips.map(trip => <TripTracker key={trip.id} trip={trip} />)}
+              </div>
+            )}
 
-            <section className="order-section card">
-              <h2>Timeline de Eventos</h2>
-              <div className="timeline">
+            <section className="card" style={{ marginTop: '32px', padding: '32px' }}>
+              <h2 style={{ fontSize: '18px', marginBottom: '24px' }}>Timeline de Eventos</h2>
+              <div className="timeline" style={{ position: 'relative', paddingLeft: '24px', borderLeft: '2px solid var(--color-mist)' }}>
                 {events.map((event, index) => (
-                  <div key={event.id} className="timeline-item">
-                    <div className="timeline-marker"></div>
-                    <div className="timeline-content">
-                      <div className="timeline-header">
-                        <span className="event-type">{event.eventType.replace(/_/g, ' ')}</span>
-                        <span className="event-date">{new Date(event.createdAt).toLocaleString()}</span>
-                      </div>
-                      <p className="event-desc">{event.description}</p>
-                      <span className="event-user">Por: {event.user.firstName} {event.user.lastName}</span>
-                    </div>
+                  <div key={event.id} style={{ position: 'relative', marginBottom: '24px' }}>
+                    <div style={{ position: 'absolute', left: '-31px', top: '0', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--color-rausch-coral)', border: '4px solid white' }}></div>
+                    <div style={{ fontSize: '14px', fontWeight: '700', marginBottom: '4px' }}>{event.eventType.replace(/_/g, ' ')}</div>
+                    <div style={{ fontSize: '13px', color: 'var(--color-slate)', marginBottom: '4px' }}>{event.description}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--color-stone)' }}>{new Date(event.createdAt).toLocaleString()} • Por {event.user.firstName}</div>
                   </div>
                 ))}
               </div>
@@ -140,37 +122,35 @@ export default function OrderDetailPage() {
           </div>
 
           <div className="order-sidebar">
-            <div className="card">
-              <h3>Acciones Rápidas</h3>
-              <p className="sidebar-hint">Estado actual: <strong>{order.state.name}</strong></p>
-              <div className="sidebar-actions">
+            <div className="card" style={{ padding: '32px', position: 'sticky', top: '100px' }}>
+              <h3 style={{ fontSize: '16px', marginBottom: '16px' }}>Acciones Rápidas</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {order.state.code === 'CREATED' && (
                   <button className="btn btn-primary full-width" onClick={() => setShowPaymentModal(true)}>
                     <DollarSign size={16} style={{ marginRight: '8px' }} />
                     Reportar Pago
                   </button>
                 )}
-                {order.state.code === 'PAYMENT_REJECTED' && (
-                  <button className="btn btn-danger full-width" onClick={() => setShowPaymentModal(true)}>
-                    Corregir Pago
-                  </button>
-                )}
                 {order.state.code === 'PAID' && (
-                  <button className="btn btn-primary full-width" onClick={() => setShowTripModal(true)}>
-                    <Truck size={16} style={{ marginRight: '8px' }} />
-                    Despachar Carga
-                  </button>
+                  <>
+                    <button className="btn btn-primary full-width" onClick={() => setShowWmsModal(true)}>
+                      <Database size={16} style={{ marginRight: '8px' }} />
+                      Recibir en Almacén
+                    </button>
+                    <button className="btn btn-primary full-width" onClick={() => setShowTripModal(true)}>
+                      <Truck size={16} style={{ marginRight: '8px' }} />
+                      Despachar Carga
+                    </button>
+                    <button className="btn btn-secondary full-width" onClick={() => setShowInspectionModal(true)}>
+                      <ClipboardCheck size={16} style={{ marginRight: '8px' }} />
+                      Realizar Inspección
+                    </button>
+                  </>
                 )}
                 {order.state.code === 'DELIVERED' && (
                   <button className="btn btn-primary full-width" onClick={() => setShowReviewModal(true)}>
                     <Star size={16} style={{ marginRight: '8px' }} />
                     Finalizar y Calificar
-                  </button>
-                )}
-                {order.state.code === 'PAID' && (
-                  <button className="btn btn-secondary full-width" onClick={() => setShowInspectionModal(true)}>
-                    <ClipboardCheck size={16} style={{ marginRight: '8px' }} />
-                    Realizar Inspección
                   </button>
                 )}
                 <button className="btn btn-secondary full-width">Enviar Mensaje</button>
@@ -179,43 +159,11 @@ export default function OrderDetailPage() {
           </div>
         </div>
 
-        {showPaymentModal && (
-          <PaymentForm 
-            order={order} 
-            onClose={() => {
-              setShowPaymentModal(false);
-              window.location.reload();
-            }} 
-          />
-        )}
-        
-        {showTripModal && (
-          <TripAssignmentForm 
-            order={order} 
-            onClose={() => {
-              setShowTripModal(false);
-              window.location.reload();
-            }} 
-          />
-        )}
-
-        {showReviewModal && (
-          <ReviewForm 
-            order={order} 
-            onClose={() => {
-              setShowReviewModal(false);
-              window.location.reload();
-            }} 
-          />
-        )}
-
-        {showInspectionModal && (
-          <InspectionForm 
-            orderId={order.id} 
-            templateId={1} 
-            onClose={() => setShowInspectionModal(false)} 
-          />
-        )}
+        {showPaymentModal && <PaymentForm order={order} onClose={() => { setShowPaymentModal(false); window.location.reload(); }} />}
+        {showWmsModal && <WmsReceiveModal order={order} onClose={() => setShowWmsModal(false)} onReceived={() => { setShowWmsModal(false); window.location.reload(); }} />}
+        {showTripModal && <TripAssignmentForm order={order} onClose={() => { setShowTripModal(false); window.location.reload(); }} />}
+        {showReviewModal && <ReviewForm order={order} onClose={() => { setShowReviewModal(false); window.location.reload(); }} />}
+        {showInspectionModal && <InspectionForm orderId={order.id} templateId={1} onClose={() => setShowInspectionModal(false)} />}
       </div>
     </AppLayout>
   );

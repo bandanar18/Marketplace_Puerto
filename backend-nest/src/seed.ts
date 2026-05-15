@@ -144,14 +144,14 @@ async function seed() {
   // ════════════════════════════════════════════════════════════════════════
 
   const roleRepo = ds.getRepository(Role);
-  const roleSuperAdmin = await roleRepo.save({ name: 'PROF-SUP-003', description: 'Superadmin',          level: 4 });
-  const roleOperador   = await roleRepo.save({ name: 'PROF-OPE-004', description: 'Operador Interno',     level: 3 });
-  const roleAuditor    = await roleRepo.save({ name: 'PROF-AUD-008', description: 'Auditor',              level: 3 });
-  const roleCliente    = await roleRepo.save({ name: 'PROF-CLI-001', description: 'Cliente Final',         level: 1 });
-  const roleTienda     = await roleRepo.save({ name: 'PROF-TIE-002', description: 'Tienda Logística',      level: 2 });
-  const roleInspector  = await roleRepo.save({ name: 'PROF-INS-005', description: 'Inspector',             level: 2 });
-  const roleTrans      = await roleRepo.save({ name: 'PROF-TRP-006', description: 'Transportista',         level: 2 });
-  const roleAgente     = await roleRepo.save({ name: 'PROF-AGA-007', description: 'Agente Aduanal',        level: 2 });
+  const roleSuperAdmin = await roleRepo.save({ name: 'ADMIN', description: 'Superadmin',          level: 4 });
+  const roleOperador   = await roleRepo.save({ name: 'OPERATOR', description: 'Operador Interno',     level: 3 });
+  const roleAuditor    = await roleRepo.save({ name: 'AUDITOR', description: 'Auditor',              level: 3 });
+  const roleCliente    = await roleRepo.save({ name: 'CUSTOMER', description: 'Cliente Final',         level: 1 });
+  const roleTienda     = await roleRepo.save({ name: 'STORE_OWNER', description: 'Tienda Logística',      level: 2 });
+  const roleInspector  = await roleRepo.save({ name: 'INSPECTOR', description: 'Inspector',             level: 2 });
+  const roleTrans      = await roleRepo.save({ name: 'TRANSPORTER', description: 'Transportista',         level: 2 });
+  const roleAgente     = await roleRepo.save({ name: 'CUSTOMS_AGENT', description: 'Agente Aduanal',        level: 2 });
   console.log('🎭  Roles creados');
 
   const userRepo = ds.getRepository(User);

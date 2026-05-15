@@ -34,7 +34,7 @@ export default function ServiceWizard() {
       });
 
       if (!response.ok) throw new Error('Failed to create service');
-      navigate('/');
+      navigate('/store/dashboard');
     } catch (err) {
       setError('Error al publicar el servicio');
     }

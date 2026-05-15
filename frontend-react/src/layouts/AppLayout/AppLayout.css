@@ -5,8 +5,24 @@
   background-color: var(--surface-canvas);
 }
 
+.app-container {
+  display: flex;
+  flex: 1;
+}
+
 .app-main {
   flex: 1;
+  min-height: calc(100vh - 80px);
+}
+
+.has-sidebar .app-main {
+  background-color: #fafafa;
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
 }
 
 /* Footer */

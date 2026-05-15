@@ -4,26 +4,64 @@ import { ClipboardList, CreditCard, ShieldAlert, ChevronRight, Activity } from '
 import './Dashboard.css';
 
 export default function OperatorDashboard() {
-  const [metrics, setMetrics] = useState({ pendingPayments: 0, pendingInspections: 0, pendingGateOuts: 0 });
+  const [metrics, setMetrics] = useState({ pendingPayments: 0, activeTrips: 0, pendingInspections: 0 });
+  const [pendingPayments, setPendingPayments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchMetrics = async () => {
-      const token = localStorage.getItem('token');
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/orders/operator-metrics`, {
+  const fetchData = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const [metricsRes, paymentsRes] = await Promise.all([
+        fetch(`${import.meta.env.VITE_API_URL}/orders/operator-metrics`, {
           headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await res.json();
-        setMetrics(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+        }),
+        fetch(`${import.meta.env.VITE_API_URL}/payments/pending`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+      ]);
+
+      if (metricsRes.status === 401 || paymentsRes.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+        return;
       }
-    };
-    fetchMetrics();
+
+      const metricsData = await metricsRes.json();
+      const paymentsData = await paymentsRes.json();
+      setMetrics(metricsData);
+      setPendingPayments(Array.isArray(paymentsData) ? paymentsData : []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
+
+  const handleValidatePayment = async (paymentId, status) => {
+    const token = localStorage.getItem('token');
+    if (!window.confirm(`¿Estás seguro de ${status === 'APPROVED' ? 'APROBAR' : 'RECHAZAR'} este pago?`)) return;
+    
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/payments/${paymentId}/validate`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ status, notes: status === 'REJECTED' ? 'Pago rechazado por el operador.' : 'Validación exitosa.' })
+      });
+      if (res.ok) {
+        fetchData();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   if (loading) return <AppLayout><div className="container">Cargando tablero operativo...</div></AppLayout>;
 
@@ -59,8 +97,8 @@ export default function OperatorDashboard() {
           <div className="kpi-card card" style={{ borderLeft: '6px solid #1976d2' }}>
             <div className="kpi-icon" style={{ background: '#e3f2fd' }}><ClipboardList color="#1976d2" /></div>
             <div className="kpi-data">
-              <label>Inspecciones Pendientes</label>
-              <h3>{metrics.pendingInspections}</h3>
+              <label>Viajes en Tránsito</label>
+              <h3>{metrics.activeTrips}</h3>
             </div>
             <button className="btn-icon-link"><ChevronRight /></button>
           </div>
@@ -76,35 +114,46 @@ export default function OperatorDashboard() {
         </div>
 
         <div className="card" style={{ padding: '32px' }}>
-          <h3 style={{ marginBottom: '24px' }}>Cola de Trabajo Prioritaria</h3>
+          <h3 style={{ marginBottom: '24px' }}>Cola de Trabajo Prioritaria (Pagos)</h3>
           <div className="task-list">
-            <div className="task-item" style={{ 
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-              padding: '20px', borderBottom: '1px solid var(--color-mist)' 
-            }}>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                <div style={{ width: '40px', height: '40px', background: 'var(--color-fog)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>1</div>
-                <div>
-                  <div style={{ fontWeight: '700' }}>Validar Comprobante #PAY-9921</div>
-                  <div style={{ fontSize: '12px', color: 'var(--color-slate)' }}>Orden #ORD-2026-0042 • Hace 15 min</div>
+            {pendingPayments.map((payment, index) => (
+              <div key={payment.id} className="task-item" style={{ 
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+                padding: '20px', borderBottom: '1px solid var(--color-mist)' 
+              }}>
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                  <div style={{ width: '40px', height: '40px', background: 'var(--color-fog)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {index + 1}
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: '700' }}>Ref: {payment.referenceNumber} - ${payment.amount}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--color-slate)' }}>
+                      Orden {payment.order?.orderNumber} • {payment.order?.client?.firstName} {payment.order?.client?.lastName}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button 
+                    onClick={() => handleValidatePayment(payment.id, 'REJECTED')}
+                    className="btn btn-secondary btn-sm" 
+                    style={{ background: '#fff', border: '1px solid #d32f2f', color: '#d32f2f' }}
+                  >
+                    Rechazar
+                  </button>
+                  <button 
+                    onClick={() => handleValidatePayment(payment.id, 'APPROVED')}
+                    className="btn btn-primary btn-sm"
+                  >
+                    Aprobar Pago
+                  </button>
                 </div>
               </div>
-              <button className="btn btn-primary btn-sm">Revisar Ahora</button>
-            </div>
-            
-            <div className="task-item" style={{ 
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-              padding: '20px', borderBottom: '1px solid var(--color-mist)' 
-            }}>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                <div style={{ width: '40px', height: '40px', background: 'var(--color-fog)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>2</div>
-                <div>
-                  <div style={{ fontWeight: '700' }}>Asignar Inspector para Gate-in</div>
-                  <div style={{ fontSize: '12px', color: 'var(--color-slate)' }}>Terminal Puerto Norte • Hace 45 min</div>
-                </div>
+            ))}
+            {pendingPayments.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '40px', color: 'var(--color-slate)' }}>
+                No hay pagos pendientes de validación.
               </div>
-              <button className="btn btn-primary btn-sm">Asignar</button>
-            </div>
+            )}
           </div>
         </div>
       </div>

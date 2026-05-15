@@ -22,10 +22,16 @@ export default function CustomerDashboard() {
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);
+      if (reqRes.status === 401 || orderRes.status === 401) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+        return;
+      }
       const reqData = await reqRes.json();
       const orderData = await orderRes.json();
-      setRequests(reqData);
-      setOrders(orderData);
+      setRequests(Array.isArray(reqData) ? reqData : []);
+      setOrders(Array.isArray(orderData) ? orderData : []);
     } catch (error) {
       console.error(error);
     } finally {

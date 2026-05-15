@@ -1,6 +1,7 @@
 import { Controller, Get, Param, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
+import { StoresService } from '../stores/stores.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('Órdenes y Servicios')
@@ -8,7 +9,10 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 @Controller('orders')
 @UseGuards(JwtAuthGuard)
 export class OrdersController {
-  constructor(private ordersService: OrdersService) {}
+  constructor(
+    private ordersService: OrdersService,
+    private storesService: StoresService
+  ) {}
 
   @ApiOperation({ summary: 'Listar mis órdenes (Cliente)' })
   @Get('my-orders')
@@ -16,10 +20,16 @@ export class OrdersController {
     return this.ordersService.findByClient(req.user.userId);
   }
 
-  @ApiOperation({ summary: 'Obtener estadísticas de órdenes personales' })
+  @ApiOperation({ summary: 'Obtener estadísticas de órdenes' })
   @Get('stats')
   async getStats(@Request() req) {
-    return this.ordersService.getStats(req.user.userId);
+    // Determine if we should show stats as a client or as a store owner
+    if (req.user.role === 'STORE_OWNER') {
+      const store = await this.storesService.findByOwner(req.user.userId);
+      if (!store) return { totalOrders: 0, totalGMV: 0, statusDistribution: {} };
+      return this.ordersService.getStats(store.id, 'store');
+    }
+    return this.ordersService.getStats(req.user.userId, 'client');
   }
 
   @ApiOperation({ summary: 'Obtener métricas operativas (Solo Staff)' })
@@ -30,10 +40,9 @@ export class OrdersController {
 
   @Get('store-orders')
   async getStoreOrders(@Request() req) {
-    // Note: Store ID retrieval logic should be handled here or in the service
-    // For now, we assume the user is the owner of the store
-    // This part might need further refinement based on user-store relationship
-    return this.ordersService.findByStore(req.user.userId); // Placeholder
+    const store = await this.storesService.findByOwner(req.user.userId);
+    if (!store) return [];
+    return this.ordersService.findByStore(store.id);
   }
 
   @Get(':id')

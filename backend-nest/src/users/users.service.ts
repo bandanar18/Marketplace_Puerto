@@ -16,7 +16,8 @@ export class UsersService {
   async findOneByEmail(email: string): Promise<User | null> {
     return this.usersRepository.findOne({ 
       where: { email },
-      relations: ['role'] 
+      relations: ['role'],
+      select: ['id', 'email', 'passwordHash', 'firstName', 'lastName']
     });
   }
 
@@ -46,6 +47,31 @@ export class UsersService {
     const { email, role, passwordHash, ...updateData } = data;
     
     Object.assign(user, updateData);
+    return this.usersRepository.save(user) as any as Promise<User>;
+  }
+
+  async findAll(): Promise<User[]> {
+    return this.usersRepository.find({
+      relations: ['role'],
+      order: { id: 'DESC' }
+    });
+  }
+
+  async updateStatus(id: number, isActive: boolean): Promise<User> {
+    const user = await this.findOne(id);
+    if (!user) throw new Error('User not found');
+    user.isActive = isActive;
+    return this.usersRepository.save(user) as any as Promise<User>;
+  }
+
+  async updateRole(id: number, roleName: string): Promise<User> {
+    const user = await this.findOne(id);
+    if (!user) throw new Error('User not found');
+    
+    const role = await this.rolesRepository.findOneBy({ name: roleName });
+    if (!role) throw new Error('Role not found');
+    
+    user.role = role;
     return this.usersRepository.save(user) as any as Promise<User>;
   }
 }
