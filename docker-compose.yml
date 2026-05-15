@@ -1,0 +1,112 @@
+# =============================================================
+#  Puerto - Marketplace Logístico  |  docker-compose.yml
+#  Levanta: PostgreSQL 15 · pgAdmin 4 · Backend NestJS · Frontend React
+#
+#  Uso rápido:
+#    docker-compose up --build -d
+#
+#  Accesos:
+#    Frontend  → http://localhost:8080
+#    Backend   → http://localhost:3000
+#    pgAdmin   → http://localhost:5050  (admin@puerto.com / admin123)
+#    DB        → localhost:5432         (postgres / postgres123)
+# =============================================================
+
+services:
+
+  # ─────────────────────────────────────────────────────────
+  #  PostgreSQL 15  (base de datos principal, tipo Odoo)
+  # ─────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: puerto_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: logistica_tos
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - puerto_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d logistica_tos"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+
+  # ─────────────────────────────────────────────────────────
+  #  pgAdmin 4  (interfaz visual tipo Odoo para la DB)
+  # ─────────────────────────────────────────────────────────
+  pgadmin:
+    image: dpage/pgadmin4:8
+    container_name: puerto_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@puerto.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - puerto_net
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin-servers.json:/pgadmin4/servers.json:ro
+
+  # ─────────────────────────────────────────────────────────
+  #  Backend  NestJS + TypeORM
+  # ─────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend-nest
+      dockerfile: Dockerfile
+    container_name: puerto_backend
+    restart: unless-stopped
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres123
+      DB_NAME: logistica_tos
+      JWT_SECRET: antigravity_secret_2026
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - puerto_net
+
+  # ─────────────────────────────────────────────────────────
+  #  Frontend  React + Vite → Nginx
+  # ─────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend-react
+      dockerfile: Dockerfile
+    container_name: puerto_frontend
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - puerto_net
+
+# ─────────────────────────────────────────────────────────────
+networks:
+  puerto_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  pgadmin_data:

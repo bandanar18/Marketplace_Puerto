@@ -1,0 +1,15 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Puerto - Logistica TOS",
+      "Group": "Puerto Marketplace",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "logistica_tos",
+      "Username": "postgres",
+      "Password": "postgres123",
+      "SSLMode": "prefer",
+      "SavePassword": true
+    }
+  }
+}

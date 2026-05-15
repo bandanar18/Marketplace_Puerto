@@ -28,7 +28,7 @@ export class CertificateOfDeposit {
   @CreateDateColumn()
   issuedAt: Date;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamp' })
   expiresAt: Date;
 }
 
@@ -56,6 +56,6 @@ export class PledgeBond {
   @CreateDateColumn()
   issuedAt: Date;
 
-  @Column({ type: 'datetime', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   releasedAt: Date;
 }
